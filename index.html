@@ -41,9 +41,10 @@
       const message = `Твоя линейка: ${size} см 📐`;
       document.getElementById('result').textContent = message;
 
-      // Отправка размера в бота
-      Telegram.WebApp.sendData(JSON.stringify({ size: size }));
+      // Отправка данных боту
+      Telegram.WebApp.sendData(JSON.stringify({ size }));
     };
   </script>
 </body>
 </html>
+
