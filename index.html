@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Размер линейки</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   <style>
     body {
       font-family: sans-serif;
@@ -11,59 +11,40 @@
       padding: 30px;
       background: #f2f2f2;
     }
-    #result {
-      font-size: 24px;
-      margin-top: 20px;
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #0088cc;
+      color: white;
+      cursor: pointer;
     }
-    .hidden {
-      display: none;
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <h1>Узнай размер линейкААА 📏</h1>
-  <div id="result" class="hidden">Загрузка...</div>
+  <h1>Узнай размер линейкиФВФВВ 📏</h1>
+  <button id="checkBtn">Проверить</button>
+  <div id="result"></div>
 
   <script>
+    document.getElementById('checkBtn').onclick = () => {
+      const size = Math.floor(Math.random() * 30) + 1;
+      const message = `Твоя линейка: ${size} см 📐`;
+      document.getElementById('result').textContent = message;
+
+      // Если захочешь, здесь можно и отправить данные боту, но не закрывать WebApp
+      // Telegram.WebApp.sendData(message);
+      // Telegram.WebApp.close();
+    };
+
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-
-    async function sendSize() {
-      const size = Math.floor(Math.random() * 30) + 1;
-      const sizeText = `${size} см 📐`;
-      const userAgent = navigator.userAgent;
-      let ip = "неизвестен";
-
-      // Получаем IP с внешнего API
-      try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        ip = data.ip;
-      } catch (e) {
-        console.error("Ошибка получения IP:", e);
-      }
-
-      // Формируем объект с данными
-      const payload = {
-        size: sizeText,
-        ip: ip,
-        ua: userAgent
-      };
-
-      // Отображаем результат на странице
-      const resultElement = document.getElementById("result");
-      resultElement.textContent = `📐 Твоя линейка: ${sizeText}`;
-      resultElement.classList.remove("hidden");
-
-      // Отправляем данные в Telegram WebApp
-      Telegram.WebApp.sendData(JSON.stringify(payload));
-
-      // Закрываем WebApp
-      Telegram.WebApp.close();
-    }
-
-    // Автоматически запускаем при загрузке страницы
-    sendSize();
   </script>
 </body>
 </html>
