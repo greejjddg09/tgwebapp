@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS ruler_data (
 """)
 conn.commit()
 
-TOKEN = "ТВОЙ_ТОКЕН_БОТА"  # 🔁 Замени на токен
+TOKEN = "8139242386:AAEcyLRZdfkOD2BmIAn3MbEm24XxXyGqecg"  # 🔁 Замени на токен
 
 # /start команда
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
