@@ -28,25 +28,37 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     await update.message.reply_text("Жми кнопку и узнай размер линейки!", reply_markup=reply_markup)
 
-# Получение данных из WebApp
 async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        user = update.effective_user
         data = json.loads(update.message.web_app_data.data)
         size = data.get("size")
 
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        user = update.effective_user
+        timestamp = datetime.now().isoformat()
 
-        cursor.execute(
-            "INSERT INTO ruler_data (user_id, username, size, timestamp) VALUES (?, ?, ?, ?)",
-            (user.id, user.username or "", size, timestamp)
-        )
+        # Сохраняем в SQLite
+        conn = sqlite3.connect("webapp_data.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS measurements (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                username TEXT,
+                size INTEGER,
+                timestamp TEXT
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO measurements (user_id, username, size, timestamp)
+            VALUES (?, ?, ?, ?)
+        """, (user.id, user.username or "", size, timestamp))
         conn.commit()
+        conn.close()
 
-        await update.message.reply_text(f"✅ Сохранено: {size} см")
+        await update.message.reply_text(f"Сохранено: {size} см от @{user.username or 'пользователя'}")
 
     except Exception as e:
-        await update.message.reply_text(f"❌ Ошибка: {e}")
+        await update.message.reply_text(f"Ошибка при обработке данных: {e}")
 
 # Запуск
 def main():
