@@ -5,7 +5,7 @@ TOKEN = "8139242386:AAEcyLRZdfkOD2BmIAn3MbEm24XxXyGqecg"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [KeyboardButton("📏 Узнать размер", web_app=WebAppInfo(url="https://твоя-ссылка-на-webapp.vercel.app"))]
+        [KeyboardButton("📏 Узнать размер", web_app=WebAppInfo(url="https://tgwebapp-mocha.vercel.app/"))]
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     await update.message.reply_text("Жми кнопку и узнай размер линейки!", reply_markup=reply_markup)
