@@ -55,7 +55,7 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 # 🔹 Запуск бота
 def main():
-    app = ApplicationBuilder().token("8139242386:AAEM27uS51BB8fWJAMXPbsxuY_-wS1HvYRM").build()  # ← вставь токен своего бота
+    app = ApplicationBuilder().token("8139242386:AAEcyLRZdfkOD2BmIAn3MbEm24XxXyGqecg").build()  # ← вставь токен своего бота
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
     app.run_polling()
