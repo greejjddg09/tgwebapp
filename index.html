@@ -31,17 +31,18 @@
   <h1>Узнай размер  📏</h1>
   <button id="checkBtn">Проверить</button>
   <div id="result"></div>
-  <button class="button"><a style="text-decoration: none;"href="../play.html"><p style="color: white;"class="btntext">ПОДРОБНЕЕ</p></a></button>
+  <button class="button"><a style="text-decoration: none;"href="../web app tg/play.html"><p style="color: white;"class="btntext">ПОДРОБНЕЕ</p></a></button>
 
   <script>
-     const size = Math.floor(Math.random() * 30) + 1;
+     document.getElementById('checkBtn').onclick = () => {
+      const size = Math.floor(Math.random() * 30) + 1;
       const message = `Твоя линейка: ${size} см 📐`;
       document.getElementById('result').textContent = message;
-
-        Telegram.WebApp.sendData(JSON.stringify({ size }));
-  // Никаких sendData — WebApp остаётся открытым
-};
-
+      Telegram.WebApp.sendData(JSON.stringify({ size }));
+      // Если захочешь, здесь можно и отправить данные боту, но не закрывать WebApp
+      // Telegram.WebApp.sendData(message);
+      // Telegram.WebApp.close();
+    };
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
   </script>
