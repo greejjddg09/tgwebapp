@@ -8,51 +8,64 @@
       margin: 0;
       background-color: #9eeef0;
       text-align: center;
+      font-family: sans-serif;
     }
     canvas {
       border: 1px solid #000;
       background: #87ceeb;
+      display: block;
+      margin: 0 auto;
+    }
+    #restartBtn {
+      display: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h3 id="score">Очки: 0</h3>
   <canvas id="gameCanvas" width="300" height="500"></canvas>
+  <button id="restartBtn">Перезапустить</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     let score = 0;
+    let gameRunning = true;
     let plane = { x: 50, y: 200, width: 40, height: 40, velocity: 0 };
     const gravity = 0.6;
     const lift = -10;
 
-    // Загружаем изображение самолета
     const planeImg = new Image();
-    planeImg.src = "./hqq.png"; // путь к твоему изображению
+    planeImg.src = "./hqq.png"; // картинка самолета
+
+    const towerImg = new Image();
+    towerImg.src = "./hqb.png"; // картинка башни
 
     const buildings = [];
+    let frame = 0;
 
     function drawPlane() {
       ctx.drawImage(planeImg, plane.x, plane.y, plane.width, plane.height);
     }
 
-    const towerImg = new Image();
-      towerImg.src = "./hqb.png";
-
     function drawBuildings() {
       buildings.forEach(b => {
-      ctx.drawImage(towerImg, b.x, 0, b.width, b.top);
-      ctx.drawImage(towerImg, b.x, b.top + b.gap, b.width, canvas.height - b.top - b.gap);
-  });
-}
+        // верхняя башня
+        ctx.drawImage(towerImg, b.x, 0, b.width, b.top);
+        // нижняя башня
+        ctx.drawImage(towerImg, b.x, b.top + b.gap, b.width, canvas.height - b.top - b.gap);
+      });
+    }
 
     function updateBuildings() {
       for (let i = 0; i < buildings.length; i++) {
         buildings[i].x -= 2;
 
-        // Увеличить очки при проходе
+        // Добавляем очки
         if (buildings[i].x + buildings[i].width === plane.x) {
           score++;
           document.getElementById("score").textContent = "Очки: " + score;
@@ -67,12 +80,12 @@
             plane.y + plane.height > buildings[i].top + buildings[i].gap
           )
         ) {
-          alert("Игра окончена! Очки: " + score);
-          location.reload();
+          gameOver();
+          return;
         }
       }
 
-      // Удаляем вышедшие за экран здания
+      // Удаляем старые здания
       if (buildings.length && buildings[0].x + buildings[0].width < 0) {
         buildings.shift();
       }
@@ -83,7 +96,14 @@
       buildings.push({ x: canvas.width, top, width: 40, gap: 120 });
     }
 
+    function gameOver() {
+      gameRunning = false;
+      document.getElementById("restartBtn").style.display = "inline-block";
+    }
+
     function gameLoop() {
+      if (!gameRunning) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       plane.velocity += gravity;
@@ -95,25 +115,34 @@
 
       if (frame % 100 === 0) addBuilding();
 
-      // Падение
+      // Падение вниз или вверх
       if (plane.y + plane.height > canvas.height || plane.y < 0) {
-        alert("Игра окончена! Очки: " + score);
-        location.reload();
+        gameOver();
+        return;
       }
 
       frame++;
       requestAnimationFrame(gameLoop);
     }
 
-    let frame = 0;
     document.addEventListener("keydown", () => {
-      plane.velocity = lift;
+      if (gameRunning) {
+        plane.velocity = lift;
+      }
     });
 
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      location.reload();
+    });
+
+    // Запускаем игру, когда загружены картинки
     planeImg.onload = () => {
-      gameLoop();
+      towerImg.onload = () => {
+        gameLoop();
+      };
     };
   </script>
 </body>
 </html>
+
 
