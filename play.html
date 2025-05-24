@@ -1,49 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Размер линейки</title>
-  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+  <meta charset="UTF-8">
+  <title>Flappy Plane</title>
   <style>
     body {
-      font-family: sans-serif;
+      margin: 0;
+      background-color: #9eeef0;
       text-align: center;
-      padding: 30px;
-      background: #f2f2f2;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      background-color: #0088cc;
-      color: white;
-      cursor: pointer;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 24px;
-      color: #333;
+    canvas {
+      border: 1px solid #000;
+      background: #87ceeb;
     }
   </style>
 </head>
 <body>
-  <h1>Узнай размер линейки 📏</h1>
-  <button id="checkBtn">Проверить</button>
-  <div id="result"></div>
+  <h3 id="score">Очки: 0</h3>
+  <canvas id="gameCanvas" width="300" height="500"></canvas>
 
   <script>
-     document.getElementById('checkBtn').onclick = () => {
-      const size = Math.floor(Math.random() * 30) + 1;
-      const message = `Твоя линейка: ${size} см 📐`;
-      document.getElementById('result').textContent = message;
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-      // Если захочешь, здесь можно и отправить данные боту, но не закрывать WebApp
-      // Telegram.WebApp.sendData(message);
-      // Telegram.WebApp.close();
+    let score = 0;
+    let plane = { x: 50, y: 200, width: 40, height: 40, velocity: 0 };
+    const gravity = 0.6;
+    const lift = -10;
+
+    // Загружаем изображение самолета
+    const planeImg = new Image();
+    planeImg.src = "./hqq.png"; // путь к твоему изображению
+
+    const buildings = [];
+
+    function drawPlane() {
+      ctx.drawImage(planeImg, plane.x, plane.y, plane.width, plane.height);
+    }
+
+    const towerImg = new Image();
+      towerImg.src = "./hqb.png";
+
+    function drawBuildings() {
+      buildings.forEach(b => {
+      ctx.drawImage(towerImg, b.x, 0, b.width, b.top);
+      ctx.drawImage(towerImg, b.x, b.top + b.gap, b.width, canvas.height - b.top - b.gap);
+  });
+}
+
+    function updateBuildings() {
+      for (let i = 0; i < buildings.length; i++) {
+        buildings[i].x -= 2;
+
+        // Увеличить очки при проходе
+        if (buildings[i].x + buildings[i].width === plane.x) {
+          score++;
+          document.getElementById("score").textContent = "Очки: " + score;
+        }
+
+        // Проверка столкновения
+        if (
+          plane.x < buildings[i].x + buildings[i].width &&
+          plane.x + plane.width > buildings[i].x &&
+          (
+            plane.y < buildings[i].top ||
+            plane.y + plane.height > buildings[i].top + buildings[i].gap
+          )
+        ) {
+          alert("Игра окончена! Очки: " + score);
+          location.reload();
+        }
+      }
+
+      // Удаляем вышедшие за экран здания
+      if (buildings.length && buildings[0].x + buildings[0].width < 0) {
+        buildings.shift();
+      }
+    }
+
+    function addBuilding() {
+      const top = Math.random() * 200 + 50;
+      buildings.push({ x: canvas.width, top, width: 40, gap: 120 });
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      plane.velocity += gravity;
+      plane.y += plane.velocity;
+
+      drawPlane();
+      drawBuildings();
+      updateBuildings();
+
+      if (frame % 100 === 0) addBuilding();
+
+      // Падение
+      if (plane.y + plane.height > canvas.height || plane.y < 0) {
+        alert("Игра окончена! Очки: " + score);
+        location.reload();
+      }
+
+      frame++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    let frame = 0;
+    document.addEventListener("keydown", () => {
+      plane.velocity = lift;
+    });
+
+    planeImg.onload = () => {
+      gameLoop();
     };
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
   </script>
 </body>
 </html>
+
