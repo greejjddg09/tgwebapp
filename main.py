@@ -1,20 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import sqlite3
-import datetime
-import os
 
 app = Flask(__name__)
 
-# Создание базы данных и таблицы при первом запуске
+# Инициализация базы данных
 def init_db():
     conn = sqlite3.connect('scores.db')
-    cursor = conn.cursor()
-    cursor.execute('''
+    c = conn.cursor()
+    c.execute('''
         CREATE TABLE IF NOT EXISTS scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
-            score INTEGER,
-            timestamp TEXT
+            user_id TEXT,
+            score INTEGER
         )
     ''')
     conn.commit()
@@ -22,32 +19,29 @@ def init_db():
 
 init_db()
 
-@app.route("/")
+@app.route('/')
 def home():
-    return "Backend работает!"
+    return 'Backend работает!'
 
-@app.route("/submit_score", methods=["POST"])
+@app.route('/submit_score', methods=['POST'])
 def submit_score():
     data = request.get_json()
-    username = data.get("username")
-    score = data.get("score")
+    user_id = data.get('user_id')
+    score = data.get('score')
 
-    if not username or score is None:
-        return jsonify({"status": "error", "message": "Missing username or score"}), 400
-
-    timestamp = datetime.datetime.utcnow().isoformat()
+    if user_id is None or score is None:
+        return {'status': 'error', 'message': 'Неверные данные'}, 400
 
     conn = sqlite3.connect('scores.db')
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO scores (username, score, timestamp) VALUES (?, ?, ?)",
-                   (username, score, timestamp))
+    c = conn.cursor()
+    c.execute('INSERT INTO scores (user_id, score) VALUES (?, ?)', (user_id, score))
     conn.commit()
     conn.close()
 
-    return jsonify({"status": "success", "message": "Score saved"}), 200
+    return {'status': 'success'}
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
+
 
 
