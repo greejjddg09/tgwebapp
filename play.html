@@ -8,6 +8,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+      text-align: center;
       height: 100%;
       background-color: #87ceeb;
       font-family: sans-serif;
@@ -39,6 +40,21 @@
       display: none;
       z-index: 3;
     }
+    #home{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, +80%);
+      padding: 12px 40px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff4444;
+      color: white;
+      cursor: pointer;
+      display: none;
+      z-index: 3;
+    }
 
     canvas {
       display: block;
@@ -48,7 +64,7 @@
 <body>
   <div id="score">Очки: 0</div>
   <button id="restartBtn" onclick="restartGame()">RESTART</button>
-  <button id="restartBtn" ><a style="text-decoration: none;"href="../index.html" ></a>HOME</button>
+  <button id="home"class="button"><a   style="text-decoration: none; color: #fff;"href="./index.html">HOME</a></button>
   <canvas id="gameCanvas"></canvas>
 
   <script>
@@ -65,7 +81,7 @@
     let score = 0;
     let plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
     const gravity = 0.6;
-    const lift = -7;
+    const lift = -8;
 
     let isGameOver = false;
     const buildings = [];
@@ -115,7 +131,7 @@
 
     function addBuilding() {
       const top = Math.random() * (canvas.height / 2);
-      buildings.push({ x: canvas.width, top, width: 60, gap: 200 });
+      buildings.push({ x: canvas.width, top, width: 60, gap: 400 });
     }
 
     let frame = 0;
@@ -145,6 +161,7 @@
     function endGame() {
       isGameOver = true;
       document.getElementById("restartBtn").style.display = "block";
+      document.getElementById("home").style.display = "block";
 
       ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -164,6 +181,7 @@
       buildings.length = 0;
       frame = 0;
       document.getElementById("score").textContent = "Очки: 0";
+      document.getElementById("home").style.display = "none";
       document.getElementById("restartBtn").style.display = "none";
       gameLoop();
     }
@@ -180,6 +198,7 @@
   </script>
 </body>
 </html>
+
 
 
 
