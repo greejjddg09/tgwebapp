@@ -11,7 +11,7 @@
       padding: 30px;
       background: #f2f2f2;
     }
-    button {
+    .check {
       padding: 10px 20px;
       font-size: 18px;
       border: none;
@@ -20,6 +20,35 @@
       color: white;
       cursor: pointer;
     }
+    .btntext{
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color : white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .button {
+              background-color: rgb(197, 81, 14);
+              border-color: gray;
+              border: 1.5px solid ;
+              border-color: transparent;
+              border-radius: 10px;
+              text-align: center;
+              padding: 0.1px 10px; /* Устанавливает размеры кнопки */
+              margin: 0 auto; /* Центрирует кнопку по горизонтали */
+      margin-top: auto; /* Смещает кнопку вниз */
+      cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    button:hover .btntext{
+      color: orange;
+    }
+    body:hover .button{
+      background-color: (197, 81, 14);
+      border-color: transparent;
+
+}
     #result {
       margin-top: 20px;
       font-size: 24px;
@@ -29,9 +58,9 @@
 </head>
 <body>
   <h1>Узнай размер  📏</h1>
-  <button id="checkBtn">Проверить</button>
+  <button class="check" id="checkBtn">Проверить</button>
   <div id="result"></div>
-  <button class="button"><a style="text-decoration: none;"href="../play.html"><p style="color: white;"class="btntext">ПОДРОБНЕЕ</p></a></button>
+  <button class="button"><a style="text-decoration: none;"href="../play.html"><p class="btntext">PLAY</p></a></button>
 
   <script>
      document.getElementById('checkBtn').onclick = () => {
@@ -48,3 +77,4 @@
   </script>
 </body>
 </html>
+
