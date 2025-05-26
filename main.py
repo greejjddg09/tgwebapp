@@ -51,6 +51,18 @@ def get_scores():
     conn.close()
     return {'scores': results}
 
+@app.route('/scores', methods=['GET'])
+def get_scores():
+    conn = sqlite3.connect('scores.db')
+    c = conn.cursor()
+    c.execute('SELECT username, score, timestamp FROM scores ORDER BY timestamp DESC')
+    rows = c.fetchall()
+    conn.close()
+    
+    return jsonify([
+        {'username': row[0], 'score': row[1], 'timestamp': row[2]} for row in rows
+    ])
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
 
