@@ -1,19 +1,17 @@
-from flask import Flask, request
-from flask_cors import CORS
+from flask import Flask, request, jsonify
 import sqlite3
-from datetime import datetime
+import datetime
+import os
 
 app = Flask(__name__)
-CORS(app)  # Разрешаем CORS
 
-# Создание таблицы при старте
+# Создание базы данных и таблицы при первом запуске
 def init_db():
     conn = sqlite3.connect('scores.db')
-    c = conn.cursor()
-    c.execute('''
+    cursor = conn.cursor()
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
             username TEXT,
             score INTEGER,
             timestamp TEXT
@@ -22,27 +20,34 @@ def init_db():
     conn.commit()
     conn.close()
 
-@app.route('/save_score', methods=['POST'])
-def save_score():
-    data = request.json
-    user_id = data.get('user_id')
-    username = data.get('username')
-    score = data.get('score')
-    timestamp = datetime.now().isoformat()
+init_db()
+
+@app.route("/")
+def home():
+    return "Backend работает!"
+
+@app.route("/submit_score", methods=["POST"])
+def submit_score():
+    data = request.get_json()
+    username = data.get("username")
+    score = data.get("score")
+
+    if not username or score is None:
+        return jsonify({"status": "error", "message": "Missing username or score"}), 400
+
+    timestamp = datetime.datetime.utcnow().isoformat()
 
     conn = sqlite3.connect('scores.db')
-    c = conn.cursor()
-    c.execute('INSERT INTO scores (user_id, username, score, timestamp) VALUES (?, ?, ?, ?)',
-              (user_id, username, score, timestamp))
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO scores (username, score, timestamp) VALUES (?, ?, ?)",
+                   (username, score, timestamp))
     conn.commit()
     conn.close()
-    return {'status': 'success'}
 
-@app.route('/')
-def home():
-    return "Backend is running!"
+    return jsonify({"status": "success", "message": "Score saved"}), 200
 
-if __name__ == '__main__':
-    init_db()
-    app.run(host='0.0.0.0', port=10000)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
 
