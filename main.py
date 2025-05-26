@@ -42,6 +42,14 @@ def submit_score():
     conn.close()
 
     return {'status': 'success'}
+@app.route('/get_scores', methods=['GET'])
+def get_scores():
+    conn = sqlite3.connect('scores.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM scores ORDER BY id DESC LIMIT 10')
+    results = c.fetchall()
+    conn.close()
+    return {'scores': results}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
