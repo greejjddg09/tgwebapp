@@ -47,7 +47,7 @@
 </head>
 <body>
   <div id="score">Очки: 0</div>
-  <button id="restartBtn" onclick="restartGame()">Сыграть ещё раз</button>
+  <button id="restartBtn" onclick="restartGame()">RESTART</button>
   <canvas id="gameCanvas"></canvas>
 
   <script>
@@ -114,7 +114,7 @@
 
     function addBuilding() {
       const top = Math.random() * (canvas.height / 2);
-      buildings.push({ x: canvas.width, top, width: 60, gap: 250 });
+      buildings.push({ x: canvas.width, top, width: 60, gap: 400 });
     }
 
     let frame = 0;
@@ -151,7 +151,7 @@
       ctx.fillStyle = "#fff";
       ctx.font = "32px Arial";
       ctx.textAlign = "center";
-      ctx.fillText("Игра окончена", canvas.width / 2, canvas.height / 2 - 40);
+      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
       ctx.font = "24px Arial";
       ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
     }
