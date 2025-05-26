@@ -4,49 +4,76 @@
   <meta charset="UTF-8">
   <title>Flappy Plane</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      background-color: #9eeef0;
-      text-align: center;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background-color: #87ceeb;
       font-family: sans-serif;
     }
-    canvas {
-      border: 1px solid #000;
-      background: #87ceeb;
-      display: block;
-      margin: 0 auto;
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      color: #fff;
+      font-weight: bold;
+      z-index: 2;
     }
+
     #restartBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 12px 24px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff4444;
+      color: white;
+      cursor: pointer;
       display: none;
-      padding: 10px 20px;
-      font-size: 18px;
-      margin-top: 20px;
+      z-index: 3;
+    }
+
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <h3 id="score">Очки: 0</h3>
-  <canvas id="gameCanvas" width="300" height="500"></canvas>
-  <button id="restartBtn">Перезапустить</button>
+  <div id="score">Очки: 0</div>
+  <button id="restartBtn" onclick="restartGame()">Сыграть ещё раз</button>
+  <canvas id="gameCanvas"></canvas>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
     let score = 0;
-    let gameRunning = true;
-    let plane = { x: 50, y: 200, width: 40, height: 40, velocity: 0 };
+    let plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
     const gravity = 0.6;
     const lift = -10;
 
+    let isGameOver = false;
+    const buildings = [];
+
     const planeImg = new Image();
-    planeImg.src = "./hqq.png"; // картинка самолета
+    planeImg.src = "./hqq.png"; // твое изображение самолета
 
     const towerImg = new Image();
-    towerImg.src = "./hqb.png"; // картинка башни
-
-    const buildings = [];
-    let frame = 0;
+    towerImg.src = "./hqb.png"; // твое изображение здания
 
     function drawPlane() {
       ctx.drawImage(planeImg, plane.x, plane.y, plane.width, plane.height);
@@ -54,9 +81,7 @@
 
     function drawBuildings() {
       buildings.forEach(b => {
-        // верхняя башня
         ctx.drawImage(towerImg, b.x, 0, b.width, b.top);
-        // нижняя башня
         ctx.drawImage(towerImg, b.x, b.top + b.gap, b.width, canvas.height - b.top - b.gap);
       });
     }
@@ -65,13 +90,11 @@
       for (let i = 0; i < buildings.length; i++) {
         buildings[i].x -= 2;
 
-        // Добавляем очки
         if (buildings[i].x + buildings[i].width === plane.x) {
           score++;
           document.getElementById("score").textContent = "Очки: " + score;
         }
 
-        // Проверка столкновения
         if (
           plane.x < buildings[i].x + buildings[i].width &&
           plane.x + plane.width > buildings[i].x &&
@@ -80,29 +103,23 @@
             plane.y + plane.height > buildings[i].top + buildings[i].gap
           )
         ) {
-          gameOver();
-          return;
+          endGame();
         }
       }
 
-      // Удаляем старые здания
       if (buildings.length && buildings[0].x + buildings[0].width < 0) {
         buildings.shift();
       }
     }
 
     function addBuilding() {
-      const top = Math.random() * 200 + 50;
-      buildings.push({ x: canvas.width, top, width: 40, gap: 120 });
+      const top = Math.random() * (canvas.height / 2);
+      buildings.push({ x: canvas.width, top, width: 60, gap: 160 });
     }
 
-    function gameOver() {
-      gameRunning = false;
-      document.getElementById("restartBtn").style.display = "inline-block";
-    }
-
+    let frame = 0;
     function gameLoop() {
-      if (!gameRunning) return;
+      if (isGameOver) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -115,9 +132,8 @@
 
       if (frame % 100 === 0) addBuilding();
 
-      // Падение вниз или вверх
       if (plane.y + plane.height > canvas.height || plane.y < 0) {
-        gameOver();
+        endGame();
         return;
       }
 
@@ -125,24 +141,44 @@
       requestAnimationFrame(gameLoop);
     }
 
+    function endGame() {
+      isGameOver = true;
+      document.getElementById("restartBtn").style.display = "block";
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "32px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Игра окончена", canvas.width / 2, canvas.height / 2 - 40);
+      ctx.font = "24px Arial";
+      ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
+    }
+
+    function restartGame() {
+      score = 0;
+      plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
+      isGameOver = false;
+      buildings.length = 0;
+      frame = 0;
+      document.getElementById("score").textContent = "Очки: 0";
+      document.getElementById("restartBtn").style.display = "none";
+      gameLoop();
+    }
+
     document.addEventListener("keydown", () => {
-      if (gameRunning) {
+      if (!isGameOver) {
         plane.velocity = lift;
       }
     });
 
-    document.getElementById("restartBtn").addEventListener("click", () => {
-      location.reload();
-    });
-
-    // Запускаем игру, когда загружены картинки
     planeImg.onload = () => {
-      towerImg.onload = () => {
-        gameLoop();
-      };
+      gameLoop();
     };
   </script>
 </body>
 </html>
+
 
 
