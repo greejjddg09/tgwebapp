@@ -131,7 +131,7 @@
 
     function addBuilding() {
       const top = Math.random() * (canvas.height / 2);
-      buildings.push({ x: canvas.width, top, width: 60, gap: 200 });
+      buildings.push({ x: canvas.width, top, width: 60, gap: 400 });
     }
 
     let frame = 0;
@@ -159,20 +159,40 @@
     }
 
     function endGame() {
-      isGameOver = true;
-      document.getElementById("restartBtn").style.display = "block";
-      document.getElementById("home").style.display = "block";
+  isGameOver = true;
+  document.getElementById("restartBtn").style.display = "block";
+  document.getElementById("home").style.display = "block";
 
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#fff";
-      ctx.font = "32px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
-      ctx.font = "24px Arial";
-      ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
-    }
+  ctx.fillStyle = "#fff";
+  ctx.font = "32px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+  ctx.font = "24px Arial";
+  ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
+
+  // Отправка результатов на сервер
+  const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || "unknown";
+
+  fetch("https://tgwebapp-1-9eec.onrender.com/submit_score", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      username: username,
+      score: score
+    })
+  }).then(res => res.json())
+    .then(data => {
+      console.log("Score submitted:", data);
+    }).catch(err => {
+      console.error("Error submitting score:", err);
+    });
+}
+
 
     function restartGame() {
       score = 0;
@@ -191,6 +211,13 @@
         plane.velocity = lift;
       }
     });
+    // Отправляем очки на сервер
+      const telegram = window.Telegram.WebApp;
+      const user_id = tg.initDataUnsafe.user.id;
+      const username = telegram?.initDataUnsafe?.user?.username || "anonymous";
+
+    
+   
 
     planeImg.onload = () => {
       gameLoop();
@@ -198,6 +225,7 @@
   </script>
 </body>
 </html>
+
 
 
 
