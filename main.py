@@ -1,40 +1,48 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from flask_cors import CORS
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
-DB_PATH = "scores.db"
+CORS(app)  # Разрешаем CORS
 
+# Создание таблицы при старте
 def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS scores (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT,
-                score INTEGER,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        conn.commit()
+    conn = sqlite3.connect('scores.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            username TEXT,
+            score INTEGER,
+            timestamp TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-@app.route("/submit-score", methods=["POST"])
-def submit_score():
+@app.route('/save_score', methods=['POST'])
+def save_score():
     data = request.json
-    username = data.get("username")
-    score = data.get("score")
+    user_id = data.get('user_id')
+    username = data.get('username')
+    score = data.get('score')
+    timestamp = datetime.now().isoformat()
 
-    if not username or score is None:
-        return jsonify({"error": "Missing username or score"}), 400
+    conn = sqlite3.connect('scores.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO scores (user_id, username, score, timestamp) VALUES (?, ?, ?, ?)',
+              (user_id, username, score, timestamp))
+    conn.commit()
+    conn.close()
+    return {'status': 'success'}
 
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("INSERT INTO scores (username, score) VALUES (?, ?)", (username, score))
-        conn.commit()
+@app.route('/')
+def home():
+    return "Backend is running!"
 
-    return jsonify({"message": "Score saved"}), 200
-
-init_db()
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    init_db()
+    app.run(host='0.0.0.0', port=10000)
 
