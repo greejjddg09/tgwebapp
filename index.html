@@ -184,14 +184,19 @@
 
 
     function sendScore(score) {
-      const tg = window.Telegram.WebApp;
-      const user = tg.initDataUnsafe.user;
-    
-      const payload = {
-        player_id: user.id,
-        username: user.username || 'unknown',
-        score: score
-      };
+        const tg = window.Telegram.WebApp;
+        const user = tg?.initDataUnsafe?.user;
+      
+        if (!user) {
+          console.error('❌ Нет данных пользователя из Telegram!');
+          return;
+        }
+      
+        const payload = {
+          player_id: user.id,
+          username: user.username || 'unknown',
+          score: score
+        };
       fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
         method: 'POST',
       headers: {
