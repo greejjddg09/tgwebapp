@@ -180,18 +180,23 @@
       gameLoop();
     };
 
-    
-   function sendScore(score) {
-    fetch("https://tgwebapp-8lb9.onrender.com/submit_score", {
-      method: "POST",
+        const tg = window.Telegram.WebApp;
+  const user = tg.initDataUnsafe.user;
+
+
+
+    function sendScore(score) {
+      fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
+        method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        score: score,
-          player_id: "example_player_id"
-      }),
-    });
+        player_id: user.id,
+        username: user.username,
+        score: yourScoreVariableHere
+      })
+    })
       .then(response => response.json())
       .then(data => {
         console.log("Отправка завершена:", data);
