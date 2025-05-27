@@ -174,7 +174,8 @@
   ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
 
   // Отправка результатов на сервер
-  const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || "unknown";
+const telegram = window.Telegram.WebApp;
+const user = telegram.initDataUnsafe.user;
 
   fetch("https://tgwebapp-8lb9.onrender.com/submit_score", {
     method: "POST",
@@ -182,8 +183,9 @@
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      username: username,
-      score: score
+      player_id: user.id,
+      username: user.username,
+      score: yourScoreVariableHere
     })
   }).then(res => res.json())
     .then(data => {
