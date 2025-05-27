@@ -202,10 +202,7 @@
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload) ({
-        score: score,
-        player_id: "example_player_id"
-      })
+      body: JSON.stringify(payload) 
     })
       .then(response => response.json())
       .then(data => {
