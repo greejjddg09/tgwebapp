@@ -188,9 +188,8 @@
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        player_id: user.id,
-        username: user.username || "anonymous",
-        score: yourScoreVariableHere
+        score: score,
+          player_id: "example_player_id"
       }),
     });
       .then(response => response.json())
