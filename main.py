@@ -26,20 +26,24 @@ init_db()
 def home():
     return 'Backend работает!'
 
+
 @app.route('/submit_score', methods=['POST'])
 def submit_score():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    score = data.get('score')
+    try:
+        data = request.get_json()
+        score = int(data['score'])
+        player_id = str(data['player_id'])
 
-    if user_id is None or score is None:
-        return {'status': 'error', 'message': 'Неверные данные'}, 400
+        conn = sqlite3.connect('scores.db')
+        c = conn.cursor()
+        c.execute('CREATE TABLE IF NOT EXISTS scores (id INTEGER PRIMARY KEY AUTOINCREMENT, player_id TEXT, score INTEGER)')
+        c.execute('INSERT INTO scores (player_id, score) VALUES (?, ?)', (player_id, score))
+        conn.commit()
+        conn.close()
 
-    conn = sqlite3.connect('scores.db')
-    c = conn.cursor()
-    c.execute('INSERT INTO scores (user_id, score) VALUES (?, ?)', (user_id, score))
-    conn.commit()
-    conn.close()
+        return jsonify({'status': 'success'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
 
     return {'status': 'success'}
 @app.route('/get_scores', methods=['GET'])
