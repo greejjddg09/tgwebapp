@@ -7,13 +7,19 @@ CORS(app)
 
 
 # Инициализация базы данных
+
 def init_db():
+    # Удаляем старую базу, если она есть
+    if os.path.exists('scores.db'):
+        os.remove('scores.db')
+
+    # Создаем заново с нужными полями
     conn = sqlite3.connect('scores.db')
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT,
+            player_id TEXT,
             score INTEGER
         )
     ''')
