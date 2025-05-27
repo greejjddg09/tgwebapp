@@ -183,12 +183,15 @@
 
 
 
-    function sendScore(score) {
-        const tg = window.Telegram.WebApp;
-        tg.ready(); // ⬅ обязательно
-        const user = tg?.initDataUnsafe?.user;
+  function sendScore(score) {
+        console.log("✅ SCRIPT STARTED");
 
-        console.log("USER FROM TG:", user);
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        console.log("✅ TG READY");
+        
+        const userTest = tg?.initDataUnsafe?.user;
+        console.log("👤 USER TEST:", userTest);
       
         if (!user) {
           console.error('❌ Нет данных пользователя из Telegram!');
