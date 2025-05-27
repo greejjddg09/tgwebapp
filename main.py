@@ -29,23 +29,21 @@ def home():
 
 @app.route('/submit_score', methods=['POST'])
 def submit_score():
-    try:
-        data = request.get_json()
-        score = int(data['score'])
-        player_id = str(data['player_id'])
+    data = request.get_json()
+    if not data or 'player_id' not in data or 'score' not in data:
+        return jsonify({"error": "Missing player_id or score"}), 400
 
-        conn = sqlite3.connect('scores.db')
-        c = conn.cursor()
-        c.execute('CREATE TABLE IF NOT EXISTS scores (id INTEGER PRIMARY KEY AUTOINCREMENT, player_id TEXT, score INTEGER)')
-        c.execute('INSERT INTO scores (player_id, score) VALUES (?, ?)', (player_id, score))
-        conn.commit()
-        conn.close()
+    player_id = data['player_id']
+    score = data['score']
 
-        return jsonify({'status': 'success'}), 200
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 400
+    conn = sqlite3.connect('scores.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO scores (player_id, score) VALUES (?, ?)', (player_id, score))
+    conn.commit()
+    conn.close()
 
-    return {'status': 'success'}
+    return jsonify({"message": "Score saved successfully"}), 200
+
 
 
 
