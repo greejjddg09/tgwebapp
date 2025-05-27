@@ -52,6 +52,19 @@
   <canvas id="gameCanvas"></canvas>
 
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        console.log("✅ Telegram WebApp API готов");
+    
+        // Можешь протестировать доступ к пользователю:
+        const user = Telegram.WebApp.initDataUnsafe?.user;
+        console.log("👤 USER TEST:", user);
+      } else {
+        console.warn("⚠️ Не запущено в Telegram WebApp");
+      }
+    });
+    
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -183,44 +196,46 @@
 
 
 
-  function sendScore(score) {
-        console.log("🔁 Функция sendScore вызвана");
-        console.log("✅ SCRIPT STARTED");
+function sendScore(score) {
+  if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initDataUnsafe) {
+    console.error("❌ Telegram WebApp API не доступен");
+    return;
+  }
 
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        console.log("✅ TG READY");
-        
-        const userTest = tg?.initDataUnsafe?.user;
-        console.log("👤 USER TEST:", userTest);
-      
-        if (!user) {
-          console.error('❌ Нет данных пользователя из Telegram!');
-          return;
-        }
-      
-        const payload = {
-          player_id: user.id,
-          username: user.username || 'unknown',
-          score: score
-        };
-      fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
-        method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload) 
+  const user = Telegram.WebApp.initDataUnsafe.user;
+
+  if (!user) {
+    console.error("❌ Нет данных пользователя из Telegram!");
+    return;
+  }
+
+  console.log("📤 Отправка payload:", {
+    player_id: user.id,
+    username: user.username || "unknown",
+    score
+  });
+
+  fetch("https://tgwebapp-8lb9.onrender.com/submit_score", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      player_id: user.id,
+      username: user.username || "unknown",
+      score: score
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Отправка завершена:", data);
-      })
-      .catch(err => {
-        console.error("Ошибка отправки:", err);
-      });
-    }
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("✅ Отправка завершена:", data);
+    })
+    .catch((err) => {
+      console.error("❌ Ошибка отправки:", err);
+    });
+}
 
-    console.log("USER FROM TG:", user);
+
     
   </script>
 </body>
