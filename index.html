@@ -179,6 +179,9 @@
     planeImg.onload = () => {
       gameLoop();
     };
+  
+
+
 
     function sendScore(score) {
       fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
@@ -187,9 +190,8 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        player_id: user.id,
-        username: user.username,
-        score: yourScoreVariableHere
+        score: score,
+        player_id: "example_player_id"
       })
     })
       .then(response => response.json())
@@ -204,3 +206,4 @@
   </script>
 </body>
 </html>
+
