@@ -3,7 +3,6 @@ import sqlite3
 import os
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 CORS(app)
 
@@ -67,6 +66,10 @@ def submit_score():
     conn.close()
 
     return jsonify({"message": "Score saved successfully"}), 200
+
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
