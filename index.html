@@ -187,6 +187,8 @@
         const tg = window.Telegram.WebApp;
         tg.ready(); // ⬅ обязательно
         const user = tg?.initDataUnsafe?.user;
+
+        console.log("USER FROM TG:", user);
       
         if (!user) {
           console.error('❌ Нет данных пользователя из Telegram!');
