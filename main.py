@@ -21,6 +21,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             player_id TEXT,
+            username TEXT,
             score INTEGER
         )
     ''')
@@ -41,13 +42,14 @@ def get_scores():
     c.execute('SELECT * FROM scores ORDER BY id DESC LIMIT 10')
     results = c.fetchall()
     conn.close()
-    
+
     return {
         'scores': [
-            {'id': row[0], 'player_id': row[1], 'score': row[2]}
+            {'id': row[0], 'player_id': row[1], 'username': row[2], 'score': row[3]}
             for row in results
         ]
     }
+
 
 
 @app.route('/submit_score', methods=['POST'])
