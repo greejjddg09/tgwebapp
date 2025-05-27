@@ -34,6 +34,22 @@ def home():
     return 'Backend работает!'
 
 
+@app.route('/get_scores', methods=['GET'])
+def get_scores():
+    conn = sqlite3.connect('scores.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM scores ORDER BY id DESC LIMIT 10')
+    results = c.fetchall()
+    conn.close()
+    
+    return {
+        'scores': [
+            {'id': row[0], 'player_id': row[1], 'score': row[2]}
+            for row in results
+        ]
+    }
+
+
 @app.route('/submit_score', methods=['POST'])
 def submit_score():
     data = request.get_json()
