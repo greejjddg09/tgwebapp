@@ -191,17 +191,14 @@
           player_id: "example_player_id"
         })
       })
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to submit score');
-        return response.json();
-      })
-      .then(data => {
-        console.log('Score submitted:', data);
-      })
-      .catch(err => {
-        console.error('Error submitting score:', err);
-      });
-    }
+        .then(response => response.json())
+  .then(data => {
+    console.log("Отправка завершена:", data);
+  })
+  .catch(err => {
+    console.error("Ошибка отправки:", err);
+  });
+}
   </script>
 </body>
 </html>
