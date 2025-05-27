@@ -185,6 +185,7 @@
 
     function sendScore(score) {
         const tg = window.Telegram.WebApp;
+        tg.ready(); // ⬅ обязательно
         const user = tg?.initDataUnsafe?.user;
       
         if (!user) {
