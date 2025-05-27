@@ -180,20 +180,26 @@
       gameLoop();
     };
 
-    function sendScore(score) {
-      fetch("https://tgwebapp-8lb9.onrender.com/submit_score", {
-        method: "POST",
+   function sendScore(score) {
+      fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          player_id: telegram.WebApp.initDataUnsafe.user?.id || "anonymous",
-          score: score
+          score: score,
+          player_id: "example_player_id"
         })
       })
-    .then(res => res.json())
-    .then(data => console.log("Score submitted:", data))
-    .catch(err => console.error("Error:", err));
+      .then(response => response.json())
+      .then(data => {
+        console.log("Отправка завершена:", data);
+      })
+      .catch(err => {
+        console.error("Ошибка отправки:", err);
+      });
+    }
+
   </script>
 </body>
 </html>
