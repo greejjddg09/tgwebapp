@@ -3,7 +3,7 @@ import sqlite3
 import os
 from flask_cors import CORS
 
-app = Flask(name)
+app = Flask(__name__)
 CORS(app)
 
 
