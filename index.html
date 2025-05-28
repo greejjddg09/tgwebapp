@@ -1,194 +1,79 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Flappy Plane</title>
+  <meta charset="UTF-8" />
+  <title>Размер линейки</title>
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      text-align: center;
-      height: 100%;
-      background-color: #87ceeb;
+    body {
       font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f2f2f2;
     }
-
-    #score {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 24px;
-      color: #fff;
-      font-weight: bold;
-      z-index: 2;
-    }
-
-    #restartBtn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 12px 24px;
-      font-size: 20px;
+    .check {
+      padding: 10px 20px;
+      font-size: 18px;
       border: none;
-      border-radius: 8px;
-      background-color: #ff4444;
+      border-radius: 10px;
+      background-color: #0088cc;
       color: white;
       cursor: pointer;
-      display: none;
-      z-index: 3;
     }
+    .btntext{
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color : white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .button {
+              background-color: rgb(197, 81, 14);
+              border-color: gray;
+              border: 1.5px solid ;
+              border-color: transparent;
+              border-radius: 10px;
+              text-align: center;
+              padding: 0.1px 10px; /* Устанавливает размеры кнопки */
+              margin: 0 auto; /* Центрирует кнопку по горизонтали */
+      margin-top: auto; /* Смещает кнопку вниз */
+      cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    button:hover .btntext{
+      color: orange;
+    }
+    body:hover .button{
+      background-color: (197, 81, 14);
+      border-color: transparent;
 
-    canvas {
-      display: block;
+}
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <div id="score">Очки: 0</div>
-  <button id="restartBtn" onclick="restartGame()">RESTART</button>
-  <canvas id="gameCanvas"></canvas>
+  <h1>Узнай размер  📏</h1>
+  <button class="check" id="checkBtn">Проверить</button>
+  <div id="result"></div>
+  <button class="button"><a style="text-decoration: none;"href="../play.html"><p class="btntext">PLAY</p></a></button>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
-    let score = 0;
-    let plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
-    const gravity = 0.6;
-    const lift = -8;
-
-    let isGameOver = false;
-    const buildings = [];
-
-    const planeImg = new Image();
-    planeImg.src = "./hqq.png";
-
-    const towerImg = new Image();
-    towerImg.src = "./hqb.png";
-
-    function drawPlane() {
-      ctx.drawImage(planeImg, plane.x, plane.y, plane.width, plane.height);
-    }
-
-    function drawBuildings() {
-      buildings.forEach(b => {
-        ctx.drawImage(towerImg, b.x, 0, b.width, b.top);
-        ctx.drawImage(towerImg, b.x, b.top + b.gap, b.width, canvas.height - b.top - b.gap);
-      });
-    }
-
-    function updateBuildings() {
-      for (let i = 0; i < buildings.length; i++) {
-        buildings[i].x -= 2;
-
-        if (buildings[i].x + buildings[i].width === plane.x) {
-          score++;
-          document.getElementById("score").textContent = "Очки: " + score;
-        }
-
-        if (
-          plane.x < buildings[i].x + buildings[i].width &&
-          plane.x + plane.width > buildings[i].x &&
-          (
-            plane.y < buildings[i].top ||
-            plane.y + plane.height > buildings[i].top + buildings[i].gap
-          )
-        ) {
-          endGame();
-        }
-      }
-
-      if (buildings.length && buildings[0].x + buildings[0].width < 0) {
-        buildings.shift();
-      }
-    }
-
-    function addBuilding() {
-      const top = Math.random() * (canvas.height / 2);
-      buildings.push({ x: canvas.width, top, width: 60, gap: 300 });
-    }
-
-    let frame = 0;
-    function gameLoop() {
-      if (isGameOver) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      plane.velocity += gravity;
-      plane.y += plane.velocity;
-
-      drawPlane();
-      drawBuildings();
-      updateBuildings();
-
-      if (frame % 90 === 0) addBuilding();
-
-      if (plane.y + plane.height > canvas.height || plane.y < 0) {
-        endGame();
-        return;
-      }
-
-      frame++;
-      requestAnimationFrame(gameLoop);
-    }
-
-    function endGame() {
-      isGameOver = true;
-      document.getElementById("restartBtn").style.display = "block";
-
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#fff";
-      ctx.font = "32px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
-      ctx.font = "24px Arial";
-      ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
-
-      sendScore(score);
-    }
-
-    function restartGame() {
-      score = 0;
-      plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
-      isGameOver = false;
-      buildings.length = 0;
-      frame = 0;
-      document.getElementById("score").textContent = "Очки: 0";
-      document.getElementById("restartBtn").style.display = "none";
-      gameLoop();
-    }
-
-    document.addEventListener("keydown", () => {
-      if (!isGameOver) {
-        plane.velocity = lift;
-      }
-    });
-
-    planeImg.onload = () => {
-      gameLoop();
+     document.getElementById('checkBtn').onclick = () => {
+      const size = Math.floor(Math.random() * 30) + 1;
+      const message = `Твоя линейка: ${size} см 📐`;
+      document.getElementById('result').textContent = message;
+      Telegram.WebApp.sendData(JSON.stringify({ size }));
+      // Если захочешь, здесь можно и отправить данные боту, но не закрывать WebApp
+      // Telegram.WebApp.sendData(message);
+      // Telegram.WebApp.close();
     };
-
-    function sendScore(score) {
-      if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify({ score: score }));
-      } else {
-        console.error("❌ Telegram WebApp API не доступен.");
-      }
-    }
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
   </script>
 </body>
 </html>
