@@ -40,6 +40,21 @@
       display: none;
       z-index: 3;
     }
+    #home{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, +80%);
+      padding: 12px 40px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff4444;
+      color: white;
+      cursor: pointer;
+      display: none;
+      z-index: 3;
+    }
 
     canvas {
       display: block;
@@ -49,6 +64,7 @@
 <body>
   <div id="score">Очки: 0</div>
   <button id="restartBtn" onclick="restartGame()">RESTART</button>
+  <button id="home"class="button"><a   style="text-decoration: none; color: #fff;"href="./index.html">HOME</a></button>
   <canvas id="gameCanvas"></canvas>
 
   <script>
@@ -71,10 +87,10 @@
     const buildings = [];
 
     const planeImg = new Image();
-    planeImg.src = "./hqq.png";
+    planeImg.src = "./hqq.png"; // твое изображение самолета
 
     const towerImg = new Image();
-    towerImg.src = "./hqb.png";
+    towerImg.src = "./hqb.png"; // твое изображение здания
 
     function drawPlane() {
       ctx.drawImage(planeImg, plane.x, plane.y, plane.width, plane.height);
@@ -100,7 +116,7 @@
           plane.x < buildings[i].x + buildings[i].width &&
           plane.x + plane.width > buildings[i].x &&
           (
-            plane.y < buildings[i].top 
+            plane.y < buildings[i].top ||
             plane.y + plane.height > buildings[i].top + buildings[i].gap
           )
         ) {
@@ -115,7 +131,7 @@
 
     function addBuilding() {
       const top = Math.random() * (canvas.height / 2);
-      buildings.push({ x: canvas.width, top, width: 60, gap: 300 });
+      buildings.push({ x: canvas.width, top, width: 60, gap: 400 });
     }
 
     let frame = 0;
@@ -131,9 +147,9 @@
       drawBuildings();
       updateBuildings();
 
-      if (frame % 90 === 0) addBuilding();
+      if (frame % 120 === 0) addBuilding();
 
-      if (plane.y + plane.height > canvas.height  plane.y < 0) {
+      if (plane.y + plane.height > canvas.height || plane.y < 0) {
         endGame();
         return;
       }
@@ -143,21 +159,43 @@
     }
 
     function endGame() {
-      isGameOver = true;
-      document.getElementById("restartBtn").style.display = "block";
+  isGameOver = true;
+  document.getElementById("restartBtn").style.display = "block";
+  document.getElementById("home").style.display = "block";
 
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#fff";
-      ctx.font = "32px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
-      ctx.font = "24px Arial";
-      ctx.fillText(Счет: ${score}, canvas.width / 2, canvas.height / 2);
+  ctx.fillStyle = "#fff";
+  ctx.font = "32px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+  ctx.font = "24px Arial";
+  ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
 
-      sendScore(score);
-    }
+  // Отправка результатов на сервер
+const telegram = window.Telegram.WebApp;
+const user = telegram.initDataUnsafe.user;
+
+  fetch("https://tgwebapp-8lb9.onrender.com/submit_score", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      player_id: user.id,
+      username: user.username,
+      score: yourScoreVariableHere
+    })
+  }).then(res => res.json())
+    .then(data => {
+      console.log("Score submitted:", data);
+    }).catch(err => {
+      console.error("Error submitting score:", err);
+    });
+}
+
+
     function restartGame() {
       score = 0;
       plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
@@ -165,6 +203,7 @@
       buildings.length = 0;
       frame = 0;
       document.getElementById("score").textContent = "Очки: 0";
+      document.getElementById("home").style.display = "none";
       document.getElementById("restartBtn").style.display = "none";
       gameLoop();
     }
@@ -174,34 +213,14 @@
         plane.velocity = lift;
       }
     });
+    // Отправляем очки на сервер
+
+    
+   
 
     planeImg.onload = () => {
       gameLoop();
     };
-  
-
-
-
-    function sendScore(score) {
-      fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
-        method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        score: score,
-        player_id: "example_player_id"
-      })
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Отправка завершена:", data);
-      })
-      .catch(err => {
-        console.error("Ошибка отправки:", err);
-      });
-    }
-
   </script>
 </body>
 </html>
