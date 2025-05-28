@@ -3,7 +3,7 @@ import sqlite3
 import os
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(name)
 CORS(app)
 
 
@@ -21,7 +21,6 @@ def init_db():
         CREATE TABLE IF NOT EXISTS scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             player_id TEXT,
-            username TEXT,
             score INTEGER
         )
     ''')
@@ -42,34 +41,38 @@ def get_scores():
     c.execute('SELECT * FROM scores ORDER BY id DESC LIMIT 10')
     results = c.fetchall()
     conn.close()
-
+    
     return {
         'scores': [
-            {'id': row[0], 'player_id': row[1], 'username': row[2], 'score': row[3]}
+            {'id': row[0], 'player_id': row[1], 'score': row[2]}
             for row in results
         ]
     }
 
 
-
 @app.route('/submit_score', methods=['POST'])
 def submit_score():
     data = request.get_json()
-    if not data or 'player_id' not in data or 'username' not in data or 'score' not in data:
-        return jsonify({"error": "Missing data"}), 400
+    if not data or 'player_id' not in data or 'score' not in data:
+        return jsonify({"error": "Missing player_id or score"}), 400
 
     player_id = data['player_id']
-    username = data['username']
     score = data['score']
 
     conn = sqlite3.connect('scores.db')
     c = conn.cursor()
-    c.execute('INSERT INTO scores (player_id, username, score) VALUES (?, ?, ?)', (player_id, username, score))
+    c.execute('INSERT INTO scores (player_id, score) VALUES (?, ?)', (player_id, score))
     conn.commit()
     conn.close()
 
     return jsonify({"message": "Score saved successfully"}), 200
 
+
+
+
+
+if name == 'main':
+    app.run(host='0.0.0.0', port=10000)
 
 
 
