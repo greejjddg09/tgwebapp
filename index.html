@@ -154,4 +154,41 @@
       ctx.fillStyle = "#fff";
       ctx.font = "32px Arial";
       ctx.textAlign = "center";
-      ctx.fillText("GAME OVER",
+      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+      ctx.font = "24px Arial";
+      ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
+
+      sendScore(score);
+    }
+
+    function restartGame() {
+      score = 0;
+      plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
+      isGameOver = false;
+      buildings.length = 0;
+      frame = 0;
+      document.getElementById("score").textContent = "Очки: 0";
+      document.getElementById("restartBtn").style.display = "none";
+      gameLoop();
+    }
+
+    document.addEventListener("keydown", () => {
+      if (!isGameOver) {
+        plane.velocity = lift;
+      }
+    });
+
+    planeImg.onload = () => {
+      gameLoop();
+    };
+
+    function sendScore(score) {
+      if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify({ score: score }));
+      } else {
+        console.error("❌ Telegram WebApp API не доступен.");
+      }
+    }
+  </script>
+</body>
+</html>
