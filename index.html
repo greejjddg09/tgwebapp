@@ -47,6 +47,8 @@
   </style>
 </head>
 <body>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <div id="score">Очки: 0</div>
   <button id="restartBtn" onclick="restartGame()">RESTART</button>
   <canvas id="gameCanvas"></canvas>
@@ -152,54 +154,4 @@
       ctx.fillStyle = "#fff";
       ctx.font = "32px Arial";
       ctx.textAlign = "center";
-      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
-      ctx.font = "24px Arial";
-      ctx.fillText(`Счет: ${score}`, canvas.width / 2, canvas.height / 2);
-
-      sendScore(score);
-    }
-
-    function restartGame() {
-      score = 0;
-      plane = { x: 80, y: 200, width: 50, height: 40, velocity: 0 };
-      isGameOver = false;
-      buildings.length = 0;
-      frame = 0;
-      document.getElementById("score").textContent = "Очки: 0";
-      document.getElementById("restartBtn").style.display = "none";
-      gameLoop();
-    }
-
-    document.addEventListener("keydown", () => {
-      if (!isGameOver) {
-        plane.velocity = lift;
-      }
-    });
-
-    planeImg.onload = () => {
-      gameLoop();
-    };
-    
-    function sendScore(score) {
-      fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      body: JSON.stringify({
-          score: score,
-          player_id: "example_player_id"
-        })
-      })
-    // Отправляем очки на сервер
-      .then(response => response.json())
-      .then(data => {
-        console.log("Отправка завершена:", data);
-      })
-      .catch(err => {
-        console.error("Ошибка отправки:", err);
-      });
-    }
-  </script>
-</body>
-</html>
+      ctx.fillText("GAME OVER",
