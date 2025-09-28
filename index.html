@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  
   <title>Flappy Plane</title>
   <style>
     html, body {
@@ -226,35 +226,12 @@
       drawStartScreen();
     };
 
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://tgwebapp-mocha.vercel.app/manifest.json',
-            buttonRootId: 'ton-connect'
-        });
+
    
 
     // Call the function
-    connectToWallet().catch(error => {
-        console.error("Error connecting to wallet:", error);
-    });
-    function sendScore(score) {
-      fetch('https://tgwebapp-8lb9.onrender.com/submit_score', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          score: score,
-          player_id: "example_player_id"
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Отправка завершена:", data);
-      })
-      .catch(err => {
-        console.error("Ошибка отправки:", err);
-      });
-    }
+  
   </script>
 </body>
 </html>
+
